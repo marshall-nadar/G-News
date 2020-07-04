@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">G-news</string>
+    <string name="headlines_from_india">HeadLines: India</string>
+    <string name="err_occurred">Error Occurred</string>
 </resources>

@@ -22,6 +22,7 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField("String", "BASE_URL", "\"${Urls.baseUrl}\"")
+        buildConfigField("String", "API_KEY", "\"${Keys.apiKey}\"")
 
     }
     buildTypes {
@@ -82,6 +83,7 @@ dependencies {
     implementation(Libraries.ktxLifecycleViewmodel)
     implementation(Libraries.ktxFragment)
     implementation(Libraries.ktxViewModelLifecycleLiveData)
+    implementation(Libraries.reactivestreamsViewModel)
     implementation(Libraries.ktxViewModelRuntime)
     kapt(Libraries.ktxViewModelLifeCycleCompiler)
 

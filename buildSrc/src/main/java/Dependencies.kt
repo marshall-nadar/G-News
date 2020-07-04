@@ -37,6 +37,10 @@ object Urls {
     const val baseUrl = "https://newsapi.org/"
 }
 
+object Keys {
+    const val apiKey = "60a1e5a61143401f8d26423f0463f984"
+}
+
 object Libraries {
     private object Versions {
         const val jetpack = "1.1.0"
@@ -58,6 +62,7 @@ object Libraries {
         const val retrofitRxAdapter = "2.6.3"
         const val picassoDownloader = "1.1.0"
         const val ktxLifecycleViewmodel = "2.2.0"
+        const val reactivestreamsViewModel = ktxLifecycleViewmodel
         const val ktxViewModelRuntime = ktxLifecycleViewmodel
         const val ktxViewModelLifeCycleCompiler = ktxLifecycleViewmodel
         const val ktxViewModelLifecycleLiveData = ktxLifecycleViewmodel
@@ -102,7 +107,8 @@ object Libraries {
 
     const val gson = "com.google.code.gson:gson:${Versions.gson}"
     const val gsonConverter = "com.squareup.retrofit2:converter-gson:${Versions.gsonConverter}"
-
+    const val reactivestreamsViewModel =
+        "androidx.lifecycle:lifecycle-reactivestreams-ktx:${Versions.reactivestreamsViewModel}"
     const val ktxViewModelLifecycleLiveData =
         "androidx.lifecycle:lifecycle-livedata-ktx:${Versions.ktxViewModelLifecycleLiveData}"
     const val ktxViewModelLifeCycleCompiler =

@@ -2,8 +2,10 @@ package com.adam.gnews.core.application.di
 
 import android.content.Context
 import com.adam.gnews.BuildConfig
+import com.adam.gnews.utils.Constants.API_KEY
 import com.adam.gnews.utils.Constants.CONTENT_TYPE_KEY
 import com.adam.gnews.utils.Constants.CONTENT_TYPE_VALUE
+import com.adam.gnews.utils.Constants.DATE_FORMAT
 import com.adam.gnews.utils.Constants.NETWORK_REQUEST_TIMEOUT
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.google.gson.Gson
@@ -17,6 +19,7 @@ import okhttp3.ConnectionPool
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import retrofit2.Retrofit
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
@@ -28,10 +31,12 @@ class NetworkModule {
     @Singleton
     fun providesRetrofit(
         gsonConverterFactory: GsonConverterFactory,
+        rxJava2CallAdapterFactory: RxJava2CallAdapterFactory,
         @NetworkOkHttp okHttpClient: OkHttpClient
     ): Retrofit = Retrofit.Builder()
         .baseUrl(BuildConfig.BASE_URL)
         .addConverterFactory(gsonConverterFactory)
+        .addCallAdapterFactory(rxJava2CallAdapterFactory)
         .client(okHttpClient)
         .build()
 
@@ -52,10 +57,18 @@ class NetworkModule {
         .writeTimeout(NETWORK_REQUEST_TIMEOUT, TimeUnit.SECONDS)
         .readTimeout(NETWORK_REQUEST_TIMEOUT, TimeUnit.SECONDS)
         .addInterceptor { chain ->
-            val original: Request = chain.request()
-            val request: Request = original.newBuilder()
+            val originalRequest: Request = chain.request()
+
+            val originalUrl = originalRequest.url
+
+            val url = originalUrl.newBuilder()
+                .addQueryParameter(API_KEY, BuildConfig.API_KEY)
+                .build()
+
+            val request: Request = originalRequest.newBuilder()
+                .url(url)
                 .header(CONTENT_TYPE_KEY, CONTENT_TYPE_VALUE)
-                .method(original.method, original.body)
+                .method(originalRequest.method, originalRequest.body)
                 .build()
             chain.proceed(request)
         }
@@ -85,7 +98,7 @@ class NetworkModule {
     @Provides
     @Singleton
     fun providesGson(): Gson = GsonBuilder()
-        .setDateFormat("yyyy-MM-dd'T'HH:mm'Z'")
+        .setDateFormat(DATE_FORMAT)
         .create()
 
     @Provides
@@ -104,4 +117,10 @@ class NetworkModule {
         Picasso.Builder(context)
             .downloader(okHttp3Downloader)
             .build()
+
+    @Provides
+    @Singleton
+    fun providesRxJavaCallAdapterFactory(): RxJava2CallAdapterFactory {
+        return RxJava2CallAdapterFactory.create()
+    }
 }
