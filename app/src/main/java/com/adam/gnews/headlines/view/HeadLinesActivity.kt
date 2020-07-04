@@ -1,6 +1,9 @@
 package com.adam.gnews.headlines.view
 
 import android.os.Bundle
+import android.view.View
+import android.webkit.WebViewClient
+import android.widget.FrameLayout
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.observe
@@ -11,7 +14,9 @@ import com.adam.gnews.headlines.view.adapter.ArticlePagedListAdapter
 import com.adam.gnews.headlines.viewmodel.HeadLinesVMF
 import com.adam.gnews.headlines.viewmodel.HeadLinesViewModel
 import com.adam.gnews.utils.processingstates.State
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
+import io.reactivex.disposables.Disposable
 import javax.inject.Inject
 
 class HeadLinesActivity : AppCompatActivity() {
@@ -23,6 +28,8 @@ class HeadLinesActivity : AppCompatActivity() {
 
     private val component by lazy { HeadLinesDependencyHolder.initHeadLinesComponent() }
 
+    private lateinit var rvAdapterInteractionSubSubscription: Disposable
+
     private val rvAdapter: ArticlePagedListAdapter by lazy {
         ArticlePagedListAdapter()
     }
@@ -33,6 +40,10 @@ class HeadLinesActivity : AppCompatActivity() {
         )
     }
 
+    private val behaviour: BottomSheetBehavior<FrameLayout> by lazy {
+        BottomSheetBehavior.from(binding.flWebViewContainer)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         component.inject(activity = this)
         super.onCreate(savedInstanceState)
@@ -40,11 +51,32 @@ class HeadLinesActivity : AppCompatActivity() {
 
         setUpRecyclerView()
 
+        setUpWebView()
+
         setUpLiveDataListeners()
+    }
+
+    private fun setUpWebView() {
+        binding.wwHeadLine.webViewClient = WebViewClient()
+        behaviour.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+
+            }
+
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                if (newState == BottomSheetBehavior.STATE_HIDDEN) {
+                    binding.wwHeadLine.loadUrl("about:blank")
+                }
+            }
+        })
     }
 
     private fun setUpRecyclerView() {
         rvAdapter.setUpAdapter(binding.rvHeadLines)
+        rvAdapterInteractionSubSubscription = rvAdapter.clickInteraction.subscribe { uiModel ->
+            binding.wwHeadLine.loadUrl(uiModel.url)
+            behaviour.state = BottomSheetBehavior.STATE_EXPANDED
+        }
     }
 
     private fun setUpLiveDataListeners() {
@@ -71,6 +103,21 @@ class HeadLinesActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        rvAdapterInteractionSubSubscription.dispose()
+        super.onDestroy()
+    }
+
+    override fun onBackPressed() {
+        if (behaviour.state == BottomSheetBehavior.STATE_EXPANDED) {
+            if (binding.wwHeadLine.canGoBack()) {
+                binding.wwHeadLine.goBack()
+            } else {
+                behaviour.state = BottomSheetBehavior.STATE_HIDDEN
+            }
+        } else super.onBackPressed()
     }
 
     companion object {

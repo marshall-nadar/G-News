@@ -10,9 +10,15 @@ import com.adam.gnews.R
 import com.adam.gnews.databinding.ItemHeadLineBinding
 import com.adam.gnews.headlines.uimodels.ArticleUiModel
 import com.adam.gnews.utils.extensions.setRemoteImage
+import io.reactivex.subjects.PublishSubject
+import io.reactivex.subjects.Subject
 
 class ArticlePagedListAdapter :
     PagedListAdapter<ArticleUiModel, ArticlePagedListAdapter.Holder>(ArticleUiModel.ARTICLE_DIFF_UTIL) {
+
+    val clickInteraction: Subject<ArticleUiModel> by lazy {
+        PublishSubject.create<ArticleUiModel>()
+    }
 
     fun setUpAdapter(recyclerView: RecyclerView) {
         recyclerView.adapter = this
@@ -40,7 +46,7 @@ class ArticlePagedListAdapter :
         getItem(position)?.let { holder.bind(dataSet = it) }
     }
 
-    class Holder(
+    inner class Holder(
         private val binding: ItemHeadLineBinding
     ) : RecyclerView.ViewHolder(binding.root) {
 
@@ -54,6 +60,8 @@ class ArticlePagedListAdapter :
             binding.tvHeadlineTitle.text = dataSet.title
             binding.tvHeadlineSubTitle.text = dataSet.description
             binding.tvHeadLineDate.text = dataSet.publishedAt
+
+            binding.root.setOnClickListener { clickInteraction.onNext(dataSet) }
         }
     }
 }
