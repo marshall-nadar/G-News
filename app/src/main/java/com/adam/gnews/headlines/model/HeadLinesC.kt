@@ -20,6 +20,8 @@ interface HeadLinesC {
 
         fun getHeadLineList(key: Int, requestedLoadSize: Int): Single<ArticleUiPageWrapper>
 
+        fun invalidateRepo()
+
     }
 
     interface Local {

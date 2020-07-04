@@ -9,6 +9,10 @@ import com.adam.gnews.headlines.model.HeadLinesC
 import com.adam.gnews.headlines.model.HeadLinesLocalDataSource
 import com.adam.gnews.headlines.model.HeadLinesRemoteDataSource
 import com.adam.gnews.headlines.model.HeadLinesRepository
+import com.adam.gnews.headlines.utils.ArticleDateFormatHelper
+import com.adam.gnews.headlines.utils.ArticleDateFormatHelperImpl
+import com.adam.gnews.headlines.utils.HeadLinesPreferencesHelper
+import com.adam.gnews.headlines.utils.HeadLinesPreferencesHelperImpl
 import com.adam.gnews.headlines.viewmodel.HeadLinesVMF
 import com.adam.gnews.utils.Constants.READ_DATE_FORMAT
 import dagger.Module
@@ -29,16 +33,30 @@ class HeadLinesModule {
     @Provides
     @HeadLinesScope
     fun providesRepo(
-        dateFormatter: SimpleDateFormat,
+        dateFormatter: ArticleDateFormatHelper,
         remote: HeadLinesC.Remote,
         local: HeadLinesC.Local,
-        sharedPreferences: SharedPreferences
+        sharedPreferencesHelper: HeadLinesPreferencesHelper
     ): HeadLinesC.Repository = HeadLinesRepository(
         local = local,
         remote = remote,
         dateFormatter = dateFormatter,
-        sharedPreferences = sharedPreferences
+        sharedPreferencesHelper = sharedPreferencesHelper
     )
+
+    @Provides
+    @HeadLinesScope
+    fun providesArticleDateFormatHelper(
+        dateFormatter: SimpleDateFormat
+    ): ArticleDateFormatHelper =
+        ArticleDateFormatHelperImpl(dateFormatter = dateFormatter)
+
+    @Provides
+    @HeadLinesScope
+    fun providesPreferenceHelper(
+        sharedPreferences: SharedPreferences
+    ): HeadLinesPreferencesHelper =
+        HeadLinesPreferencesHelperImpl(sharedPreferences = sharedPreferences)
 
     @Provides
     @HeadLinesScope

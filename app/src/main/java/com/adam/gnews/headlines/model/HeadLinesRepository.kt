@@ -1,29 +1,28 @@
 package com.adam.gnews.headlines.model
 
-import android.content.SharedPreferences
-import androidx.core.content.edit
 import com.adam.gnews.data.appdb.entites.ArticleDBO
 import com.adam.gnews.data.webservice.remotemodels.ArticlePageWrapper
 import com.adam.gnews.headlines.model.HeadLinesC.Repository.Companion.KEY_ARTICLE_LOCAL_SIZE
 import com.adam.gnews.headlines.uimodels.ArticleUiModel
 import com.adam.gnews.headlines.uimodels.ArticleUiPageWrapper
+import com.adam.gnews.headlines.utils.ArticleDateFormatHelper
+import com.adam.gnews.headlines.utils.HeadLinesPreferencesHelper
 import com.adam.gnews.utils.extensions.doOp
 import com.adam.gnews.utils.processingstates.State
 import io.reactivex.Single
 import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.Subject
-import java.text.SimpleDateFormat
 
 class HeadLinesRepository(
-    private val sharedPreferences: SharedPreferences,
-    private val dateFormatter: SimpleDateFormat,
+    private val sharedPreferencesHelper: HeadLinesPreferencesHelper,
+    private val dateFormatter: ArticleDateFormatHelper,
     private val local: HeadLinesC.Local,
     private val remote: HeadLinesC.Remote
 ) : HeadLinesC.Repository {
 
     private val cache: MutableList<ArticleUiModel> = mutableListOf()
 
-    private var dataLimit: Int = sharedPreferences.getInt(KEY_ARTICLE_LOCAL_SIZE, 0)
+    private var dataLimit: Int = sharedPreferencesHelper.getInt(KEY_ARTICLE_LOCAL_SIZE, 0)
 
     override val headLineStream: Subject<State<Boolean>> by lazy { PublishSubject.create<State<Boolean>>() }
 
@@ -75,6 +74,12 @@ class HeadLinesRepository(
         }
     }
 
+    override fun invalidateRepo() {
+        sharedPreferencesHelper.remove(KEY_ARTICLE_LOCAL_SIZE)
+        cache.clear()
+        dataLimit = 0
+    }
+
     private fun fetchFromRemoteAndUpdateCountCache(
         pageNo: Int,
         limit: Int
@@ -84,7 +89,7 @@ class HeadLinesRepository(
     ).doOp { wrapper ->
         with(wrapper.totalResults) {
             dataLimit = this
-            sharedPreferences.edit { putInt(KEY_ARTICLE_LOCAL_SIZE, this@with) }
+            sharedPreferencesHelper.putInt(KEY_ARTICLE_LOCAL_SIZE, this@with)
         }
     }
 

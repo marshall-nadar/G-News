@@ -8,6 +8,15 @@ class ArticlePageSourceFactory(
     private val repo: HeadLinesC.Repository
 ) : DataSource.Factory<Int, ArticleUiModel>() {
 
-    override fun create(): DataSource<Int, ArticleUiModel> = ArticlePageKeyDataSource(repo = repo)
+    private lateinit var dataSource: ArticlePageKeyDataSource
+
+
+    override fun create(): DataSource<Int, ArticleUiModel> {
+        dataSource = ArticlePageKeyDataSource(repo = repo)
+        dataSource.addInvalidatedCallback(repo::invalidateRepo)
+        return dataSource
+    }
+
+    fun invalidateDataSource() = dataSource.invalidate()
 
 }

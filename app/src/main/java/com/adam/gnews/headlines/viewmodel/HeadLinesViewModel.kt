@@ -37,6 +37,8 @@ class HeadLinesViewModel(
         )
     }
 
+    fun invalidateDataSource() = factory.invalidateDataSource()
+
     override fun onCleared() {
         super.onCleared()
         HeadLinesDependencyHolder.destroyHeadLinesComponent()

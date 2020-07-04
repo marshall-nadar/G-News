@@ -5,7 +5,7 @@ import android.os.Parcelable
 import androidx.recyclerview.widget.DiffUtil
 import com.adam.gnews.data.appdb.entites.ArticleDBO
 import com.adam.gnews.data.webservice.remotemodels.ArticleDTO
-import java.text.SimpleDateFormat
+import com.adam.gnews.headlines.utils.ArticleDateFormatHelper
 
 data class ArticleUiModel(
     val id: String,
@@ -21,14 +21,14 @@ data class ArticleUiModel(
 
     constructor(
         remoteModel: ArticleDTO,
-        dateFormatter: SimpleDateFormat
+        dateFormatter: ArticleDateFormatHelper
     ) : this(
         id = remoteModel.source.id.orEmpty(),
         sourceName = remoteModel.source.name,
         urlToImage = remoteModel.urlToImage.orEmpty(),
         url = remoteModel.url,
         title = remoteModel.title,
-        publishedAt = dateFormatter.format(remoteModel.publishedAt),
+        publishedAt = dateFormatter.formatDate(date = remoteModel.publishedAt),
         description = remoteModel.description.orEmpty(),
         content = remoteModel.content.orEmpty(),
         author = remoteModel.author.orEmpty()
@@ -36,14 +36,14 @@ data class ArticleUiModel(
 
     constructor(
         dbModel: ArticleDBO,
-        dateFormatter: SimpleDateFormat
+        dateFormatter: ArticleDateFormatHelper
     ) : this(
         id = dbModel.source.id,
         sourceName = dbModel.source.name,
         urlToImage = dbModel.urlToImage,
         url = dbModel.url,
         title = dbModel.title,
-        publishedAt = dateFormatter.format(dbModel.publishedAt),
+        publishedAt = dateFormatter.formatDate(date = dbModel.publishedAt),
         description = dbModel.description,
         content = dbModel.content,
         author = dbModel.author

@@ -6,6 +6,8 @@ import android.webkit.WebViewClient
 import android.widget.FrameLayout
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.lifecycle.observe
 import com.adam.gnews.R
 import com.adam.gnews.databinding.ActivityHeadLinesBinding
@@ -48,6 +50,8 @@ class HeadLinesActivity : AppCompatActivity() {
         component.inject(activity = this)
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+
+        binding.btnRetry.setOnClickListener { viewModel.invalidateDataSource() }
 
         setUpRecyclerView()
 
@@ -118,6 +122,11 @@ class HeadLinesActivity : AppCompatActivity() {
                 is State.Error -> {
                     binding.srfHeadLines.isRefreshing = false
                     binding.srfHeadLines.isEnabled = false
+                    with(rvAdapter.itemCount == 0) {
+                        binding.errorGroup.isVisible = this
+                        binding.rvHeadLines.isGone = this
+                    }
+
                     Snackbar.make(
                         binding.root,
                         R.string.err_occurred,
