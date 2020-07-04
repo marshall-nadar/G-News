@@ -134,7 +134,8 @@ object TestLibraries {
         const val test_liveData = "2.1.0"
         const val espresso = "3.1.0"
         const val testAacRoom = "2.2.2"
-        const val mockito = "1.+"
+        const val mockito = "1.10.19"
+        const val mockitoAndroid = "1.10.19"
         const val paging_text = "2.1.2"
     }
 
@@ -147,5 +148,6 @@ object TestLibraries {
         "androidx.test.espresso:espresso-core:${Versions.espresso}"
     const val test_Room = "androidx.room:room-testing:${Versions.testAacRoom}"
     const val mockito = "org.mockito:mockito-core:${Versions.mockito}"
+    const val mockitoAndroid = "org.mockito:mockito-core:${Versions.mockito}"
 
 }

@@ -56,6 +56,30 @@ class HeadLinesActivity : AppCompatActivity() {
         setUpLiveDataListeners()
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        saveWebViewCurrentPage(outState)
+    }
+
+    private fun saveWebViewCurrentPage(outState: Bundle) {
+        if (behaviour.state == BottomSheetBehavior.STATE_EXPANDED) {
+            outState.putString(KEY_CURRENT_PAGE, binding.wwHeadLine.url)
+        }
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        restoreWebViewUrl(savedInstanceState)
+    }
+
+    private fun restoreWebViewUrl(savedInstanceState: Bundle) {
+        if (behaviour.state == BottomSheetBehavior.STATE_EXPANDED) {
+            savedInstanceState.getString(KEY_CURRENT_PAGE)
+                ?.let(binding.wwHeadLine::loadUrl)
+        }
+    }
+
     private fun setUpWebView() {
         binding.wwHeadLine.webViewClient = WebViewClient()
         behaviour.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
@@ -122,5 +146,7 @@ class HeadLinesActivity : AppCompatActivity() {
 
     companion object {
         private const val TAG = "HeadLinesActivity"
+
+        private const val KEY_CURRENT_PAGE = "key-current-key"
     }
 }
