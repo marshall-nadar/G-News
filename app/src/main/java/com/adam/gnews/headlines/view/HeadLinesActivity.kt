@@ -145,11 +145,7 @@ class HeadLinesActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         if (behaviour.state == BottomSheetBehavior.STATE_EXPANDED) {
-            if (binding.wwHeadLine.canGoBack()) {
-                binding.wwHeadLine.goBack()
-            } else {
-                behaviour.state = BottomSheetBehavior.STATE_HIDDEN
-            }
+            behaviour.state = BottomSheetBehavior.STATE_HIDDEN
         } else super.onBackPressed()
     }
 
